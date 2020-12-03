@@ -1,3 +1,5 @@
+local getPlayerMouseAngle = require('getPlayerMouseAngle')
+
 function love.load()
   sprites = {
     background = love.graphics.newImage('assets/background.png'),
@@ -34,5 +36,14 @@ end
 function love.draw()
   love.graphics.draw(sprites.background, 0, 0)
 
-  love.graphics.draw(sprites.player, player.x, player.y)
+  love.graphics.draw(
+    sprites.player,
+    player.x,
+    player.y,
+    getPlayerMouseAngle(player.y, love.mouse.getY(), player.x, love.mouse.getX()),
+    nil,
+    nil,
+    sprites.player:getWidth() / 2,
+    sprites.player:getHeight() / 2
+  )
 end
