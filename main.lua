@@ -1,4 +1,5 @@
 local getPlayerMouseAngle = require('getPlayerMouseAngle')
+local spawnZombie = require('spawnZombie')
 
 function love.load()
   sprites = {
@@ -13,6 +14,10 @@ function love.load()
     y = love.graphics.getHeight() / 2,
     speed = 180
   }
+
+  zombies = {}
+
+
 end
 
 function love.update(deltaTime)
@@ -46,4 +51,18 @@ function love.draw()
     sprites.player:getWidth() / 2,
     sprites.player:getHeight() / 2
   )
+
+  for index, zombie in ipairs(zombies) do
+    love.graphics.draw(
+      sprites.zombie,
+      zombie.x,
+      zombie.y
+    )
+  end
+end
+
+function love.keypressed(key)
+  if key == 'space' then
+    spawnZombie()
+  end
 end
