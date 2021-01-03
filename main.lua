@@ -16,8 +16,6 @@ function love.load()
   }
 
   zombies = {}
-
-
 end
 
 function love.update(deltaTime)
@@ -36,6 +34,19 @@ function love.update(deltaTime)
   if love.keyboard.isDown('s') then
     player.y = player.y + player.speed * deltaTime
   end
+
+  for key, zombie in pairs(zombies) do
+    local cos = math.cos(
+      getPlayerMouseAngle(player.y, zombie.y, player.x, zombie.x)
+    )
+
+    local sin = math.sin(
+      getPlayerMouseAngle(player.y, zombie.y, player.x, zombie.x)
+    )
+
+    zombie.x = zombie.x + (cos * zombie.speed * deltaTime)
+    zombie.y = zombie.y + (sin * zombie.speed * deltaTime)
+  end
 end
 
 function love.draw()
@@ -45,18 +56,23 @@ function love.draw()
     sprites.player,
     player.x,
     player.y,
-    getPlayerMouseAngle(player.y, love.mouse.getY(), player.x, love.mouse.getX()),
+    getPlayerMouseAngle(love.mouse.getY(), player.y, love.mouse.getX(), player.x),
     nil,
     nil,
     sprites.player:getWidth() / 2,
     sprites.player:getHeight() / 2
   )
 
-  for index, zombie in ipairs(zombies) do
+  for key, zombie in ipairs(zombies) do
     love.graphics.draw(
       sprites.zombie,
       zombie.x,
-      zombie.y
+      zombie.y,
+      getPlayerMouseAngle(player.y, zombie.y, player.x, zombie.x),
+      nil,
+      nil,
+      sprites.zombie:getWidth() / 2,
+      sprites.zombie:getHeight() / 2
     )
   end
 end
