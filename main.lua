@@ -1,5 +1,6 @@
 local getPlayerMouseAngle = require('getPlayerMouseAngle')
 local spawnZombie = require('spawnZombie')
+local distanceBetween = require('distanceBetween')
 
 function love.load()
   sprites = {
@@ -46,6 +47,10 @@ function love.update(deltaTime)
 
     zombie.x = zombie.x + (cos * zombie.speed * deltaTime)
     zombie.y = zombie.y + (sin * zombie.speed * deltaTime)
+
+    if distanceBetween(zombie.x, zombie.y, player.x, player.y) < 30 then
+      for i = 1, #zombies do zombies[i] = nil end
+    end
   end
 end
 
