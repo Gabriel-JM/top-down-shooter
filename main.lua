@@ -37,6 +37,8 @@ function love.load()
 end
 
 function love.update(deltaTime)
+  if gameState == gameStates.pause then return end
+
   if gameState == gameStates.playing then
     if love.keyboard.isDown('d') and player.x < love.graphics.getWidth() then
       player.x = player.x + player.speed * deltaTime
@@ -136,6 +138,16 @@ end
 function love.draw()
   love.graphics.draw(sprites.background, 0, 0)
 
+  if gameState == gameStates.pause then
+    return love.graphics.printf(
+      'Paused',
+      0,
+      250,
+      love.graphics.getWidth(),
+      'center'
+    )
+  end
+
   if gameState == gameStates.start then
     love.graphics.setFont(myFont)
     love.graphics.printf(
@@ -196,6 +208,14 @@ end
 function love.keypressed(key)
   if key == 'space' then
     spawnZombie()
+  end
+
+  if key == 'return' then
+    if gameState == gameStates.start then return end
+
+    gameState = gameState == gameStates.pause
+      and gameStates.playing
+      or gameStates.pause
   end
 end
 
