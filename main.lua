@@ -30,6 +30,7 @@ function love.load()
 
   myFont = love.graphics.newFont(30)
 
+  score = 0
   gameState = gameStates.start
   maxTime = 2
   currentTimer = maxTime
@@ -37,19 +38,19 @@ end
 
 function love.update(deltaTime)
   if gameState == gameStates.playing then
-    if love.keyboard.isDown('d') then
+    if love.keyboard.isDown('d') and player.x < love.graphics.getWidth() then
       player.x = player.x + player.speed * deltaTime
     end
-  
-    if love.keyboard.isDown('a') then
+
+    if love.keyboard.isDown('a') and player.x > 0 then
       player.x = player.x - player.speed * deltaTime
     end
-  
-    if love.keyboard.isDown('w') then
+
+    if love.keyboard.isDown('w') and player.y > 0 then
       player.y = player.y - player.speed * deltaTime
     end
-  
-    if love.keyboard.isDown('s') then
+
+    if love.keyboard.isDown('s') and player.y < love.graphics.getHeight() then
       player.y = player.y + player.speed * deltaTime
     end
   end
@@ -100,6 +101,7 @@ function love.update(deltaTime)
       if distanceBetween(zombie.x, zombie.y, bullet.x, bullet.y) < 20 then
         zombie.dead = true
         bullet.dead = true
+        score = score + 1
       end
     end
   end
@@ -144,6 +146,14 @@ function love.draw()
       'center'
     )
   end
+
+  love.graphics.printf(
+    'Score: '..score,
+    0,
+    love.graphics.getHeight() - 100,
+    love.graphics.getWidth(),
+    'center'
+  )
 
   love.graphics.draw(
     sprites.player,
@@ -194,11 +204,12 @@ function love.mousepressed(x, y, button)
   if button == leftClick and gameState == gameStates.playing then
     spawnBullet()
   end
-  
+
   if button == leftClick and gameState == gameStates.start then
     gameState = gameStates.playing
     maxTime = 2
     currentTimer = maxTime
+    score = 0
   end
 
 end
