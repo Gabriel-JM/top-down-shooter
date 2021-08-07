@@ -3,7 +3,15 @@ local spawnZombie = require('spawnZombie')
 local distanceBetween = require('distanceBetween')
 local spawnBullet = require('spawnBullet')
 
+local gameStates = {
+  start = 1,
+  playing = 2,
+  pause = 3
+}
+
 function love.load()
+  math.randomseed(os.time())
+
   sprites = {
     background = love.graphics.newImage('assets/background.png'),
     bullet = love.graphics.newImage('assets/bullet.png'),
@@ -19,23 +27,31 @@ function love.load()
 
   zombies = {}
   bullets = {}
+
+  myFont = love.graphics.newFont(30)
+
+  gameState = gameStates.start
+  maxTime = 2
+  currentTimer = maxTime
 end
 
 function love.update(deltaTime)
-  if love.keyboard.isDown('d') then
-    player.x = player.x + player.speed * deltaTime
-  end
-
-  if love.keyboard.isDown('a') then
-    player.x = player.x - player.speed * deltaTime
-  end
-
-  if love.keyboard.isDown('w') then
-    player.y = player.y - player.speed * deltaTime
-  end
-
-  if love.keyboard.isDown('s') then
-    player.y = player.y + player.speed * deltaTime
+  if gameState == gameStates.playing then
+    if love.keyboard.isDown('d') then
+      player.x = player.x + player.speed * deltaTime
+    end
+  
+    if love.keyboard.isDown('a') then
+      player.x = player.x - player.speed * deltaTime
+    end
+  
+    if love.keyboard.isDown('w') then
+      player.y = player.y - player.speed * deltaTime
+    end
+  
+    if love.keyboard.isDown('s') then
+      player.y = player.y + player.speed * deltaTime
+    end
   end
 
   for key, zombie in pairs(zombies) do
@@ -52,6 +68,9 @@ function love.update(deltaTime)
 
     if distanceBetween(zombie.x, zombie.y, player.x, player.y) < 30 then
       for i = 1, #zombies do zombies[i] = nil end
+      gameState = gameStates.start
+      player.x = love.graphics.getWidth() / 2
+      player.y = love.graphics.getHeight() / 2
     end
   end
 
@@ -100,10 +119,31 @@ function love.update(deltaTime)
       table.remove(bullets, i)
     end
   end
+
+  if gameState == 2 then
+    currentTimer = currentTimer - deltaTime
+
+    if currentTimer <= 0 then
+      spawnZombie()
+      currentTimer = maxTime
+      maxTime = 0.95 * maxTime
+    end
+  end
 end
 
 function love.draw()
   love.graphics.draw(sprites.background, 0, 0)
+
+  if gameState == gameStates.start then
+    love.graphics.setFont(myFont)
+    love.graphics.printf(
+      'Click anywhere to begin!',
+      0,
+      50,
+      love.graphics.getWidth(),
+      'center'
+    )
+  end
 
   love.graphics.draw(
     sprites.player,
@@ -151,7 +191,14 @@ end
 
 function love.mousepressed(x, y, button)
   local leftClick = 1
-  if button == leftClick then
+  if button == leftClick and gameState == gameStates.playing then
     spawnBullet()
   end
+  
+  if button == leftClick and gameState == gameStates.start then
+    gameState = gameStates.playing
+    maxTime = 2
+    currentTimer = maxTime
+  end
+
 end
